@@ -1,7 +1,13 @@
 {
 	"name": "C# (.NET)",
-	"image": "mcr.microsoft.com/devcontainers/dotnet:2-10.0", // Hier zu Version 9.0.0 das sollte es beheben
+	"image": "mcr.microsoft.com/devcontainers/dotnet:2-9.0",
 	"postCreateCommand": "dotnet restore --locked-mode && dotnet dev-certs https",
+	"runArgs": [
+		"--name",
+		"deo-devcontainer",
+		"--network",
+		"deo-network"
+	],
 	"customizations": {
 		"vscode": {
 			"extensions": [
