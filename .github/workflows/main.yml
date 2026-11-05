@@ -12,8 +12,6 @@ env:
 jobs:
   build:
     runs-on: self-hosted
-    env:
-      DOTNET_INSTALL_DIR: /home/actions-runner/dotnet
     steps:
       - name: Check out repository code
         uses: actions/checkout@v5
@@ -38,9 +36,6 @@ jobs:
   test:
     runs-on: self-hosted
     needs: build
-    env:
-      DOTNET_INSTALL_DIR: /home/actions-runner/dotnet
-      NUGET_PACKAGES: /home/actions-runner/.nuget/packages
     steps:
       - name: Check out repository code
         uses: actions/checkout@v5
@@ -62,7 +57,7 @@ jobs:
         run: |
           dotnet restore --locked-mode Deo.Backend.Tests
           dotnet restore --locked-mode Deo.Frontend.Tests
-      - name: Test projects
+      - name: Test project
         run: |
           dotnet test --no-restore Deo.Backend.Tests
           dotnet test --no-restore Deo.Frontend.Tests
@@ -119,3 +114,25 @@ jobs:
         with:
           name: analyze
           path: "**/*.coverage.xml"
+
+  security:
+    runs-on: self-hosted
+    needs: test
+    permissions:
+      security-events: write
+    steps:
+      - name: Check out repositroy code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Analyze projects
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: "fs"
+          format: "sarif"
+          output: "trivy-results.sarif"
+      - name: Upload Trivy scan results to GitHub Securitys tab
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          serif_file: "trivy-results.sarif" 
+    
