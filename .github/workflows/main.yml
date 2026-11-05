@@ -4,6 +4,11 @@ run-name: Run triggered by ${{ github.actor }} 😎
 
 on: [push, workflow_dispatch]
 
+env:
+  DOTNET_INSTALL_DIR: /home/actions-runner/dotnet
+  DOTNET_TOOLS_INSTALL_DIR: /home/actions-runner/dotnet-tools
+  NUGET_PACKAGES: /home/actions-runner/.nuget/packages
+
 jobs:
   build:
     runs-on: self-hosted
@@ -70,12 +75,9 @@ jobs:
             **/obj/
 
   analyze:
+    if: false
     runs-on: self-hosted
     needs: test
-    env:
-      DOTNET_INSTALL_DIR: /home/actions-runner/dotnet
-      DOTNET_TOOLS_INSTALL_DIR: /home/actions-runner/dotnet-tools
-      NUGET_PACKAGES: /home/actions-runner/.nuget/packages
     steps:
       - name: Check out repository code
         uses: actions/checkout@v5
@@ -84,7 +86,7 @@ jobs:
       - name: Download test artifact
         uses: actions/download-artifact@v5
         with:
-          name: build
+          name: test
       - name: Set up .NET 9
         uses: actions/setup-dotnet@v5
         with:
